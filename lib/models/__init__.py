@@ -1,1 +1,1 @@
-from .TriLiteNet import get_net
+from .TriLiteNet_base import get_net

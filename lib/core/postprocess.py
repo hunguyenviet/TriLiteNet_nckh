@@ -313,27 +313,23 @@ def build_targets(cfg, predictions, targets, model):
     targets[3,x,7]
     t [index, class, x, y, w, h, head_index]
     '''
-    # Build targets for compute_loss(), input targets(image,class,x,y,w,h)
     det = model.module.model[model.module.detector_index] if is_parallel(model) \
         else model.model[model.detector_index]  # Detect() module
-    # print(type(model))
-    # det = model.model[model.detector_index]
-    # print(type(det))
     na, nt = det.na, targets.shape[0]  # number of anchors, targets
     tcls, tbox, indices, anch = [], [], [], []
-    gain = torch.ones(7, device=targets.device)  # normalized to gridspace gain
+    gain = torch.ones(7, device=targets.device).long()  # normalized to gridspace gain
     ai = torch.arange(na, device=targets.device).float().view(na, 1).repeat(1, nt)  # same as .repeat_interleave(nt)
     targets = torch.cat((targets.repeat(na, 1, 1), ai[:, :, None]), 2)  # append anchor indices
     
     g = 0.5  # bias
     off = torch.tensor([[0, 0],
                         [1, 0], [0, 1], [-1, 0], [0, -1],  # j,k,l,m
-                        # [1, 1], [1, -1], [-1, 1], [-1, -1],  # jk,jm,lk,lm
                         ], device=targets.device).float() * g  # offsets
     
     for i in range(det.nl):
         anchors = det.anchors[i] #[3,2]
-        gain[2:6] = torch.tensor(predictions[i].shape)[[3, 2, 3, 2]]  # xyxy gain
+        gain[2:6] = torch.tensor(predictions[i].shape)[[3, 2, 3, 2]].long()  # xyxy gain (chuyển sang Long)
+
         # Match targets to anchors
         t = targets * gain
 
@@ -341,7 +337,6 @@ def build_targets(cfg, predictions, targets, model):
             # Matches
             r = t[:, :, 4:6] / anchors[:, None]  # wh ratio
             j = torch.max(r, 1. / r).max(2)[0] < cfg.TRAIN.ANCHOR_THRESHOLD  # compare
-            # j = wh_iou(anchors, t[:, 4:6]) > model.hyp['iou_t']  # iou(3,n)=wh_iou(anchors(3,2), gwh(n,2))
             t = t[j]  # filter
 
             # Offsets
@@ -360,7 +355,7 @@ def build_targets(cfg, predictions, targets, model):
         b, c = t[:, :2].long().T  # image, class
         gxy = t[:, 2:4]  # grid xy
         gwh = t[:, 4:6]  # grid wh
-        gij = (gxy - offsets).long()
+        gij = (gxy - offsets).long()  # Chuyển sang Long ngay tại đây
         gi, gj = gij.T  # grid xy indices
 
         # Append
@@ -516,4 +511,4 @@ def connect_lane(image, shadow_height=0):
 
 
 
-
+   

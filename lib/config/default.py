@@ -6,8 +6,8 @@ _C = CN()
 
 _C.OUT_DIR = 'runs/'
 _C.GPUS = (0,1)     
-_C.WORKERS = 24
-_C.PIN_MEMORY = False
+_C.WORKERS = 8
+_C.PIN_MEMORY = True
 _C.PRINT_FREQ = 20
 _C.AUTO_RESUME =False       # Resume from the last training interrupt
 _C.NEED_AUTOANCHOR = True      # Re-select the prior anchor(k-means)    When training from scratch (epoch=0), set it to be ture!
@@ -26,7 +26,7 @@ _C.MODEL = CN(new_allowed=True)
 _C.MODEL.NAME = ''
 _C.MODEL.STRU_WITHSHARE = False     #add share_block to segbranch
 _C.MODEL.HEADS_NAME = ['']
-_C.MODEL.PRETRAINED = ""
+_C.MODEL.PRETRAINED = "/root/TriLiteNet/runs/checkpoint.pth"
 _C.MODEL.PRETRAINED_DET = ""
 _C.MODEL.IMAGE_SIZE = [640, 640] # width * height, ex: 192 * 256
 _C.MODEL.EXTRA = CN(new_allowed=True)
@@ -98,7 +98,7 @@ _C.TRAIN.BEGIN_EPOCH = 0
 _C.TRAIN.END_EPOCH = 240
 
 _C.TRAIN.VAL_FREQ = 1
-_C.TRAIN.BATCH_SIZE_PER_GPU =16
+_C.TRAIN.BATCH_SIZE_PER_GPU =8
 _C.TRAIN.START_VAL = 100
 _C.TRAIN.SHUFFLE = True
 
@@ -115,7 +115,7 @@ _C.TRAIN.PLOT = False                #
 
 # testing
 _C.TEST = CN(new_allowed=True)
-_C.TEST.BATCH_SIZE_PER_GPU = 16
+_C.TEST.BATCH_SIZE_PER_GPU = 8
 _C.TEST.MODEL_FILE = ''
 _C.TEST.SAVE_TXT = False
 _C.TEST.PLOTS = False
